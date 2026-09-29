@@ -1,0 +1,31 @@
+# This folder is also used as a dump, so ignore everything by default
+# and only allow the project files listed below.
+*
+!.gitignore
+!README.md
+
+# Code
+!metrics.py
+!plots.py
+!stats.py
+!randomPassssword.py
+!checker_ANSSI.py
+
+# Generated datasets
+!AI_password_chatgpt.txt
+!AI_password_claude.txt
+!AI_password_gemini.txt
+!Randompasswords.txt
+
+# Figures
+*.png
+
+# Research papers used as references
+!A_Maturity_Model_for_Password_Security_Education.pdf
+!cset14-paper-herlands.pdf
+
+# Never commit, even if a rule above would allow it
+PasswordsHuman.txt
+rockyou.txt
+chi7aja.html
+__pycache__/
