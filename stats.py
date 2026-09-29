@@ -21,3 +21,5 @@ def compare_distributions(sample_a, sample_b, name_a, name_b, metric):
         print("Distributions differ significantly")
     else:
         print("Distributions are similar")
+
+    return mw_p, ks_p

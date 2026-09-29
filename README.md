@@ -28,9 +28,10 @@ Groups are compared pairwise with the **Mann–Whitney U** test (do the medians 
 
 | File | Purpose |
 |---|---|
-| `metrics.py` | Loads the datasets, computes the metrics, draws box plots and runs the statistical tests |
+| `metrics.py` | Loads the datasets, computes the metrics, draws box plots, runs the statistical tests and saves the p-values to `results.json` |
 | `stats.py` | Mann–Whitney U and Kolmogorov–Smirnov comparisons |
-| `plots.py` | Significance heatmaps from the recorded p-values |
+| `plots.py` | Draws significance heatmaps from `results.json` |
+| `results.json` | The p-values reported in the article |
 | `randomPassssword.py` | Generates the random baseline passwords |
 | `checker_ANSSI.py` | An educational password checker based on ANSSI guidelines |
 
@@ -40,8 +41,11 @@ The folder also includes two reference papers: *A Maturity Model for Password Se
 
 ```bash
 pip install matplotlib scipy zxcvbn
-python metrics.py
+python metrics.py   # computes everything and writes results.json
+python plots.py     # draws the heatmaps from results.json
 ```
+
+**Sample size:** as in the article, only the first 100 passwords of each AI and Random file are analysed, plus the first 1,000 RockYou entries (`SAMPLE_LIMIT` and `ROCKYOU_LIMIT` in `metrics.py`). The files contain more passwords than that. Raising the limits will change the results.
 
 `metrics.py` also expects two files that aren't in this repo:
 
