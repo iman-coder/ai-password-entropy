@@ -1,4 +1,3 @@
-import json
 import math
 from collections import Counter
 import matplotlib.pyplot as plt
@@ -136,23 +135,16 @@ def plot_box(data, labels, title, ylabel):
 # Main
 # -------------------------------
 
-# Sample sizes used for the published article. Only the first N passwords
-# of each file are analysed; changing these changes the reported results.
-SAMPLE_LIMIT = 100
-ROCKYOU_LIMIT = 1000
-
-RESULTS_FILE = "results.json"
-
 if __name__ == "__main__":
     # ===== Load password datasets =====
-    random_pw = load_passwords("Randompasswords.txt", limit=SAMPLE_LIMIT)
+    random_pw = load_passwords("Randompasswords.txt", limit=100)
 
-    claude_pw = load_passwords("AI_password_claude.txt", limit=SAMPLE_LIMIT)
-    gemini_pw = load_passwords("AI_password_gemini.txt", limit=SAMPLE_LIMIT)
-    chatgpt_pw = load_passwords("AI_password_chatgpt.txt", limit=SAMPLE_LIMIT)
+    claude_pw = load_passwords("AI_password_claude.txt", limit=100)
+    gemini_pw = load_passwords("AI_password_gemini.txt", limit=100)
+    chatgpt_pw = load_passwords("AI_password_chatgpt.txt", limit=100)
 
     human_pw = load_passwords("PasswordsHuman.txt")
-    rockyou_pw = load_passwords("rockyou.txt", limit=ROCKYOU_LIMIT)
+    rockyou_pw = load_passwords("rockyou.txt", limit=1000)
 
     # ===== Analyze datasets =====
     random_res = analyze(random_pw)
@@ -244,11 +236,10 @@ if __name__ == "__main__":
         "RockYou": rockyou_res
     }
 
-    # Short names are the row labels used by plots.py
     metrics = {
-        "Shannon": ("Shannon entropy", "shannon"),
-        "Effective": ("Effective entropy", "effective"),
-        "Ratio": ("Search space ratio", "ratio")
+        "Shannon entropy": "shannon",
+        "Effective entropy": "effective",
+        "Search space ratio": "ratio"
     }
 
     pairs = [
@@ -269,21 +260,89 @@ if __name__ == "__main__":
         ("Random", "ChatGPT")
     ]
 
-    stats_results = {}
-    for short_name, (metric_name, key) in metrics.items():
-        stats_results[short_name] = {}
+    for metric_name, key in metrics.items():
         for a, b in pairs:
-            mw_p, ks_p = compare_distributions(
+            compare_distributions(
                 results[a][key],
                 results[b][key],
                 a, b,
                 metric_name
             )
-            stats_results[short_name][f"{a} vs {b}"] = {
-                "mw_p": float(mw_p),
-                "ks_p": float(ks_p)
-            }
+    
+    '''
+    random_pw = load_passwords("Randompasswords.txt", limit=100)
+    ai_pw = load_passwords("AI_password_claude.txt", limit=100)
+    human_pw = load_passwords("PasswordsHuman.txt")
+    rockyou_pw = load_passwords("rockyou.txt", limit=1000)
 
-    with open(RESULTS_FILE, "w", encoding="utf-8") as f:
-        json.dump(stats_results, f, indent=2)
-    print(f"\nSaved p-values to {RESULTS_FILE}")
+    random_res = analyze(random_pw)
+    ai_res = analyze(ai_pw)
+    human_res = analyze(human_pw)
+    rockyou_res = analyze(rockyou_pw)
+
+    labels = ["Random", "AI", "Human", "RockYou"]
+
+    plot_box(
+        [random_res["shannon"], ai_res["shannon"], human_res["shannon"], rockyou_res["shannon"]],
+        labels,
+        "Shannon Entropy Distribution",
+        "Entropy (bits)"
+    )
+
+    plot_box(
+        [random_res["effective"], ai_res["effective"], human_res["effective"], rockyou_res["effective"]],
+        labels,
+        "Effective Entropy Distribution",
+        "Entropy (bits)"
+    )
+
+    plot_box(
+        [random_res["ratio"], ai_res["ratio"], human_res["ratio"], rockyou_res["ratio"]],
+        labels,
+        "Search Space Reduction Ratio",
+        "Effective / Ideal Entropy"
+    )
+
+    if ZXCVBN_AVAILABLE:
+        plot_box(
+            [random_res["zxcvbn"], ai_res["zxcvbn"], human_res["zxcvbn"], rockyou_res["zxcvbn"]],
+            labels,
+            "zxcvbn Score Distribution",
+            "Score (0–4)"
+        )
+        
+    #print("\n=== Results ===")
+    #print("Random:", random_res)
+    #print("AI:", ai_res)
+    #print("Human:", human_res)
+    #print("RockYou:", rockyou_res)
+    
+    print("\n=== Statistical Comparisons ===")    
+    results = {
+        "Random": random_res,
+        "AI": ai_res,
+        "Human": human_res,
+        "RockYou": rockyou_res
+    }
+
+    metrics = {
+        "Shannon entropy": "shannon",
+        "Effective entropy": "effective",
+        "Search space ratio": "ratio"
+    }
+
+    pairs = [
+        ("Random", "AI"),
+        ("AI", "Human"),
+        ("AI", "RockYou"),
+        ("Random", "RockYou")
+    ]
+
+    for metric_name, key in metrics.items():
+        for a, b in pairs:
+            compare_distributions(
+                results[a][key],
+                results[b][key],
+                a, b,
+                metric_name
+            )'''
